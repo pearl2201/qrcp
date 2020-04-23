@@ -1,14 +1,14 @@
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
 namespace Qrdesktop.Views
 {
-    public class TodoListView : UserControl
+    public class MenuView : UserControl
     {
-        public TodoListView()
+        public MenuView()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
 
         private void InitializeComponent()

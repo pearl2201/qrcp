@@ -1,21 +1,25 @@
-﻿using Qrdesktop.Models;
-using Qrdesktop.Services;
-using ReactiveUI;
+﻿using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reactive.Linq;
 using System.Text;
 using System.Threading;
+using Avalonia.Controls;
+using Avalonia;
+using Qrdesktop.Utils;
+using Avalonia.Controls.ApplicationLifetimes;
+using static Qrdesktop.Utils.NetworkHelper;
+
 namespace Qrdesktop.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
     {
         ViewModelBase content;
         Process myProcess;
-        public MainWindowViewModel(Database db)
+        public MainWindowViewModel()
         {
-            Content = List = new TodoListViewModel(db.GetItems());
+            Content = Menu = new MenuViewModel();
         }
 
         public ViewModelBase Content
@@ -24,65 +28,85 @@ namespace Qrdesktop.ViewModels
             private set => this.RaiseAndSetIfChanged(ref content, value);
         }
 
-        public TodoListViewModel List { get; }
+        public MenuViewModel Menu { get; }
 
-        public void AddItem()
+        public static Mutex mutex = new Mutex();
+      
+
+        public async void OpenSendServer()
         {
-            var vm = new AddItemViewModel();
+            mutex.WaitOne();
 
-            Observable.Merge(
-                vm.Ok,
-                vm.Cancel.Select(_ => (TodoItem)null))
-                .Take(1)
-                .Subscribe(model =>
+            var window = GetWindow();
+            var dialog = new OpenFileDialog()
+            {
+                AllowMultiple = false,
+                Title = "Select File Sent"
+            };
+            var files = await dialog.ShowAsync(window);
+
+            if (files != null && files.Length > 0)
+            {
+                try
                 {
-                    if (model != null)
+                    int port = NetworkHelper.GetAvailablePort(5000);
+                    string ipAddress = NetworkHelper.GetLocalIPAddress();
+                    var token = NetworkHelper.GetURL() + System.IO.Path.GetExtension(files[0]);
+                    var vm = new SendViewModel(files[0], ipAddress, port, token);
+                    Content = vm;
+                    vm.Stop.Subscribe(_ =>
                     {
-                        List.Items.Add(model);
-                    }
-
-                    Content = List;
-                });
-
-            Content = vm;
+                        Content = Menu;
+                    });
+                }
+                catch (NoNetworkingException ex)
+                {
+                    Console.WriteLine("No Networking: " + ex.ToString());
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
+            mutex.ReleaseMutex();
         }
 
-        public void OpenServer()
+        public async void OpenReceiveServer()
         {
-            try
+            mutex.WaitOne();
+
+            var window = GetWindow();
+            var dialog = new SaveFileDialog()
             {
-                //{
-                //    myProcess = new Process();
+               
+                Title = "Select File Receive"
+            };
+            var file = await dialog.ShowAsync(window);
 
-
-                //    myProcess.StartInfo.UseShellExecute = true;
-                //    // You can start any process, HelloWorld is a do-nothing example.
-                //    myProcess.StartInfo.FileName = @"F:\Ann\Dev\learn\csharp\qrcp\qrserver\bin\Debug\netcoreapp3.1\qrserver.exe";
-                //    myProcess.StartInfo.CreateNoWindow = false;
-                //    myProcess.StartInfo.Arguments = "--send F:\\Ann\\Dev\\temp\\dst_dir\\Test.cs";
-                //    myProcess.Start();
-                //    // This code assumes the process you are starting will terminate itself.
-                //    // Given that is is started without a window so you cannot terminate it
-                //    // on the desktop, it must terminate itself or you can do it programmatically
-                //    // from this application using the Kill method.
-                // The Work to perform on another thread 
-                ThreadStart start = delegate ()
+            if (file != null && !string.IsNullOrEmpty(file))
+            {
+                try
                 {
-                    // ... 
-                    // This will throw an exception 
-                    // (it's on the wrong thread) 
-                    //qrserver.Program.Main("");
-                    string[] args = new string[1] { "--send F:\\Ann\\Dev\\temp\\dst_dir\\Test.cs" };
-                    qrserver.Program.RunServerAtPort(args, new string[1]{"http://localhost:8080"});
-                };
-                // Create the thread and kick it started! 
-                new Thread(start).Start();
-
+                    int port = NetworkHelper.GetAvailablePort(5000);
+                    string ipAddress = NetworkHelper.GetLocalIPAddress();
+                    var token = NetworkHelper.GetURL() + System.IO.Path.GetExtension(file);
+                    var vm = new ReceiveViewModel(file, ipAddress, port, token);
+                    Content = vm;
+                    vm.Stop.Subscribe(_ =>
+                    {
+                        Content = Menu;
+                    });
+                }
+                catch (NoNetworkingException ex)
+                {
+                    Console.WriteLine("No Networking: " + ex.ToString());
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
+            mutex.ReleaseMutex();
         }
     }
 }

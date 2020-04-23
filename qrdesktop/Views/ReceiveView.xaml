@@ -1,0 +1,13 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Qrdesktop.Views.ReceiveView">
+  <StackPanel>
+    <Image Margin="4" Name="QrImage" Source="{Binding Bitmap}"/>
+    <TextBlock Margin="4" HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap">Scan the following URL with a QR reader to start the file transfer:</TextBlock>
+    <TextBlock Margin="4" Text="{Binding URL}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+    <Button  Margin="4" DockPanel.Dock="Bottom" Command="{Binding Stop}">Stop</Button>
+  </StackPanel>
+</UserControl>

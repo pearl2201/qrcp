@@ -4,9 +4,9 @@ using Avalonia.Markup.Xaml;
 
 namespace Qrdesktop.Views
 {
-    public class AddItemView : UserControl
+    public class SendView : UserControl
     {
-        public AddItemView()
+        public SendView()
         {
             this.InitializeComponent();
         }

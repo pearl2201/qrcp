@@ -23,6 +23,7 @@ namespace qrserver
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddControllers();
             services.AddRazorPages();
             services.AddSingleton<ContextServices>(new ContextServices());
             services.AddSingleton<QrServices>(new QrServices());
@@ -52,6 +53,7 @@ namespace qrserver
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();
+                endpoints.MapControllers();
             });
         }
     }
