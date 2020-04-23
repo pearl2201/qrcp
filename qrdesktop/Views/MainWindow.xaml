@@ -4,6 +4,6 @@
         x:Class="Qrdesktop.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
         Width="300" Height="450"
-        Title="Avalonia Todo"
+        Title="Qrcp"
         Content="{Binding Content}">
 </Window>

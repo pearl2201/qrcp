@@ -2,6 +2,7 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <AssemblyName>Qrcp</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
     <Compile Update="**\*.xaml.cs">
