@@ -28,7 +28,7 @@ namespace qrserver.Controllers
         }
 
         [HttpGet("{token}")]
-        public async Task<IActionResult> Get(string token)
+        public IActionResult Get(string token)
         {
             if (action != ProgramAction.SEND)
                 return NotFound();
@@ -41,7 +41,7 @@ namespace qrserver.Controllers
             if (stream == null)
                 return NotFound(); // returns a NotFoundResult with Status404NotFound response.
 
-            return new FileStreamResult(stream, "application/octet-stream"); // returns a 
+            return new FileStreamResult(stream, "application/octet-stream"); 
         }
 
     }
